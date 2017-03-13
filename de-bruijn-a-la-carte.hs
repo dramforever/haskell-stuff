@@ -112,4 +112,7 @@ instance {-# INCOHERENT #-}
   liftVar = suc . liftVar
 
 -- We can indeed check that all of these work as intended
-main = print c
+main = do
+  print c
+  let expected = "((S ((S (K S)) ((S ((S (K S)) ((S (K K)) (K S)))) ((S ((S (K S)) ((S ((S (K S)) ((S (K K)) (K S)))) ((S ((S (K S)) ((S (K K)) (K K)))) ((S (K K)) I))))) ((S (K K)) (K I)))))) ((S ((S (K S)) ((S (K K)) (K K)))) (K I)))"
+  putStrLn (if expected == show c then "Okay" else "Not okay")
