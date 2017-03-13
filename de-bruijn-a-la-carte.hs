@@ -105,7 +105,9 @@ instance LiftVar a a where
 instance {-# INCOHERENT #-}
 --       ^^^^^^^^^^^^^^^^^^ WTF?
 -- This makes GHC prefer the base case above, because this one is
--- incoherent, and the base case one doesn't.
+-- marked 'incoherent', and the base case one doesn't.
+--        ^^^^^^^^^^^^ If I got it right, it really isn't. It just tricks
+--                     GHC into not picking it
 --
 -- See: https://redd.it/5z53uw
     (Lambda v, LiftVar u v) => LiftVar u (Scope v) where
