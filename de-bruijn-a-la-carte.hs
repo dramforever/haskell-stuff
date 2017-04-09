@@ -1,11 +1,12 @@
 #!/usr/bin/env stack
--- stack runghc
+-- stack exec ghci
 
 -- Idea by MarisaKirisame
 
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -99,19 +100,19 @@ class LiftVar u v where
   liftVar :: u -> v
 
 -- Base case
-instance LiftVar a a where
+instance {-# OVERLAPPING #-}
+    LiftVar a a where
   liftVar = id
 
-instance {-# INCOHERENT #-}
---       ^^^^^^^^^^^^^^^^^^ WTF?
--- This makes GHC prefer the base case above, because this one is
--- marked 'incoherent', and the base case one doesn't.
---        ^^^^^^^^^^^^ If I got it right, it really isn't. It just tricks
---                     GHC into not picking it
---
--- See: https://redd.it/5z53uw
-    (Lambda v, LiftVar u v) => LiftVar u (Scope v) where
-  liftVar = suc . liftVar
+class LiftVarScope u v where
+  liftVarScope :: u -> v
+
+instance (Lambda v, LiftVar u v) => LiftVarScope u (Scope v) where
+  liftVarScope = suc . liftVar
+
+instance {-# OVERLAPPABLE #-}
+    (LiftVarScope u v) => LiftVar u v where
+  liftVar = liftVarScope
 
 -- We can indeed check that all of these work as intended
 main = do
