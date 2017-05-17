@@ -332,15 +332,22 @@ instance (Fresh x, Fresh y, Fresh z) => Fresh (x, y, z) where
 instance (Fresh x, Fresh y, Fresh z, Fresh w) => Fresh (x, y, z, w) where
     fresh f = fresh $ \(x, y, z) -> fresh $ \w -> f (x, y, z, w)
 
+newtype ExprRes f a = ExprRes (Free f a)
+
+instance (Show (f (ExprRes f a)), Show a, Functor f) => Show (ExprRes f a) where
+    show (ExprRes u) = case u of
+        Pure m -> show m
+        Free f -> show (ExprRes <$> f)
+
 run
     :: (MonadLogic m, ExactZip f, Traversable f)
-    => (Var -> Rule f) -> m (Var, [Constraint f])
+    => (Var -> Rule f) -> m (ExprRes f Var, [Constraint f])
 run x = runYieldT $ evalStateT go initialState
     where
         go = do
             v <- freshVar
             interpret (x v)
-            liftA2 (,) (findTop v) dumpConstraints
+            liftA2 (,) (ExprRes <$> report v) dumpConstraints
 
 appendo :: Expr -> Expr -> Expr -> Rule F
 appendo xs ys zs =
