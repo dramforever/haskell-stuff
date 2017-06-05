@@ -8,4 +8,5 @@ My Haskell snippets
 
     Compile with `-O` to see the effect of the optimizer.
 
-    Inspired by [ghc-proofs]( https://github.com/nomeata/ghc-proofs), but uses rewrite rules so it's more lightweight, albeit less powerful
+    Inspired by [ghc-proofs](https://github.com/nomeata/ghc-proofs), but uses rewrite rules so it's more lightweight, albeit less powerful
+- `dfa-regex` uses [an algorithm that has a very long name](http://r6.ca/blog/20110808T035622Z.html) to generate regular expressions from DFAs. Contains a regex that recognizes binary numbers that are divisible by 7.
