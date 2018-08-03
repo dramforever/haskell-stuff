@@ -209,7 +209,7 @@ disunify u1 v1 = do
         else do
             case (ru, rv) of
                 (Just (Complex fu), Just (Complex fv)) ->
-                    maybe (pure ()) sequence_ (exactZipWith disunify fu fv)
+                    maybe (pure ()) asum (exactZipWith disunify fu fv)
                 _ -> do
                     usVarMap . at u ?= NoLink (addNotEqual v ru)
                     usVarMap . at v ?= NoLink (addNotEqual u rv)
