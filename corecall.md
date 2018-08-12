@@ -168,4 +168,4 @@ So basically, a `StablePtr` is an entry in some global table of 'please don't fr
 
 And I didn't copy the code here, but that's it. `stable_ptr_table` is just an array of pointers, which automatically expands as needed. The pointer also doubles as a linked list of free entries. The GC checks this table and knows that the values pointed to are still accessible.
 
-*Exercise*: There are a few pieces of code shown here that are in GHC's source. Find how to generate them.
+*Exercise*: There are a few pieces of code shown here that are not in GHC's source. Find how to generate them.
