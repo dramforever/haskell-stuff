@@ -162,7 +162,7 @@ How did we do this? In `rts/Stable.c`:
 
 > Our solution is to keep a table of all objects we've given to the C-world and to make sure that the garbage collector collects[1] these objects --- updating the table as required to make sure we can still find the object.
 
-(I think 'collects' means 'sees and doesn't free', instead of 'frees'.)
+([1]: I think 'collects' means 'sees and doesn't free', instead of 'frees'.)
 
 So basically, a `StablePtr` is an entry in some global table of 'please don't free me' things. And you can't really reliably get the underlying pointer to the Haskell value in C because you weren't supposed to know what it was.
 
