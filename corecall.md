@@ -18,7 +18,7 @@ In your program two things are added:
 And it when it is time for `wrapper fn`:
 
 1. A `StablePtr` of `fn` is created, which tells the GC not to garbage collect the function.
-2. An *adjustor* is created by dynamically writing machine code.
+2. An *adjustor* is created by dynamically writing machine code that calls the C function with the `StablePtr` and more arguments from C. Basically a closure in machine code.
 3. The address to the machine code of the *adjustor* is wrapped in a `FunPtr` and returned.
 
 ## A breakdown of some of the code involved
