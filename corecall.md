@@ -25,7 +25,7 @@ And it when it is time for `wrapper fn`:
 
 ### A C function
 
-GHC generates, in a C file, this function, and compiles/links it into your program later:
+GHC generates, this C function, and compiles/links it into your program: (Get this with `-ddump-foreign`.)
 
 ```c
 HsInt zdmainzdMainzdMainzuwrapper(StgStablePtr the_stableptr, HsInt a1)
@@ -80,6 +80,8 @@ rts_getInt (HaskellObj p)
 
 ### A generated Haskell function
 
+(Get this with `-ddump-simpl`.)
+
 ```haskell
 wrapper
   = \ function srw1 ->
@@ -111,6 +113,8 @@ wrapper
 
 A `__pkg_ccall` to what? C-- reveals the answer:
 
+(Get this from `-ddump-cmm`.)
+
 ```cmm
  c1Jy:
      unwind Sp = Just Sp + 8;
@@ -122,6 +126,8 @@ A `__pkg_ccall` to what? C-- reveals the answer:
 It's actually a call to `createAdjustor`, basically `createAdjustor(1, R1, zdmainzdMainzdMainzuwrapper, main4_bytes)`. 
 
 By the way, `main4` is:
+
+(`-ddump-simpl`)
 
 ```haskell
 main4 :: Addr#
@@ -144,9 +150,9 @@ An adjustor is basically a piece of *dynamically created machine code* that arra
 void* createAdjustor (int cconv, StgStablePtr hptr, StgFunPtr wptr, char *typeString);
 ```
 
-(Note that the `libffi` version of this function is probably not used, at least by default, as I cannot find `USE_LIBFFI_FOR_ADJUSTORS` anywhere else. Try starting by finding `#else // To end of file...`.)
+(Note that the `libffi` version of this function is probably not used, at least by default, as I cannot find `USE_LIBFFI_FOR_ADJUSTORS` anywhere else, and the wrapper has a wrong type. Try starting by finding `#else // To end of file...`.)
 
-`cconv` is `1`, which means `ccall`. (It can also be `0` on `mingw32`, which means `stdcall`).
+`cconv` is `1`, which means `ccall`. (It can also be `0` non-`darwin` x86, which means `stdcall`).
 
 (The non-`libffi` version of) `createAdjustor` is a monstrosity, with more than a thousand lines in its implementation, mainly due to the need to cater for all the architectures GHC needs to support.
 
@@ -167,5 +173,3 @@ How did we do this? In `rts/Stable.c`:
 So basically, a `StablePtr` is an entry in some global table of 'please don't free me' things. And you can't really reliably get the underlying pointer to the Haskell value in C because you weren't supposed to know what it was.
 
 And I didn't copy the code here, but that's it. `stable_ptr_table` is just an array of pointers, which automatically expands as needed. The pointer also doubles as a linked list of free entries. The GC checks this table and knows that the values pointed to are still accessible.
-
-*Exercise*: There are a few pieces of code shown here that are not in GHC's source. Find how to generate them.
